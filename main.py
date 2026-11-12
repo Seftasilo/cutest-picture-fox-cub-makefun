@@ -25,6 +25,12 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     src = os.path.join(HERE, "entry.png")
     dst = os.path.join(out_dir, "entry.png")
+    # The bundled art must be a real PNG: refuse anything else before
+    # copying, so a wrong file can never be submitted silently.
+    with open(src, "rb") as f:
+        if f.read(8) != b"\x89PNG\r\n\x1a\n":
+            print("entry.png: not a PNG file", file=sys.stderr)
+            sys.exit(1)
     shutil.copyfile(src, dst)
     # Confirm the copy is byte-identical, not just the same length: a
     # same-length but corrupted write must fail loudly instead of
